@@ -6,6 +6,13 @@ import (
 	"net/http"
 )
 
+type Response struct {
+	status  bool
+	code    int
+	message string
+	data    interface{}
+}
+
 func ParseBody(r *http.Request, x interface{}) {
 	if body, err := ioutil.ReadAll((r.Body)); err == nil {
 		if err := json.Unmarshal([]byte(body), x); err != nil {
@@ -14,34 +21,26 @@ func ParseBody(r *http.Request, x interface{}) {
 	}
 }
 
+func responseHandler(w http.ResponseWriter, r Response) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(r.code)
 
-func responseHandler(status bool, code int, message string, data interface{}) interface{} {
-	return map[string]interface{}{
-		"status":  status,
-		"code":    code,
-		"message": message,
-		"data":    data,
+	response := map[string]interface{}{
+		"status":  r.status,
+		"code":    r.code,
+		"message": r.message,
+		"data":    r.data,
 	}
+
+	res, _ := json.Marshal(response)
+
+	w.Write(res)
 }
 
 func HandleSucess(w http.ResponseWriter, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	response := responseHandler(true, http.StatusOK, "success", data)
-
-	res, _ := json.Marshal(response)
-
-	w.Write(res)
+	responseHandler(w, Response{status: true, code: http.StatusOK, message: "success", data: data})
 }
 
 func HandleCreated(w http.ResponseWriter, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	response := responseHandler(true, http.StatusCreated, "success", data)
-
-	res, _ := json.Marshal(response)
-
-	w.Write(res)
+	responseHandler(w, Response{status: true, code: http.StatusCreated, message: "success", data: data})
 }
