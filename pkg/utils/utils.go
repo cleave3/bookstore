@@ -14,14 +14,21 @@ func ParseBody(r *http.Request, x interface{}) {
 	}
 }
 
+
+func responseHandler(status bool, code int, message string, data interface{}) interface{} {
+	return map[string]interface{}{
+		"status":  status,
+		"code":    code,
+		"message": message,
+		"data":    data,
+	}
+}
+
 func HandleSucess(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	response := make(map[string]interface{})
-	response["status"] = true
-	response["code"] = http.StatusOK
-	response["message"] = "success"
-	response["data"] = data
+
+	response := responseHandler(true, http.StatusOK, "success", data)
 
 	res, _ := json.Marshal(response)
 
@@ -31,12 +38,8 @@ func HandleSucess(w http.ResponseWriter, data interface{}) {
 func HandleCreated(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	
-	response := make(map[string]interface{})
-	response["status"] = true
-	response["code"] = http.StatusCreated
-	response["message"] = "success"
-	response["data"] = data
+
+	response := responseHandler(true, http.StatusCreated, "success", data)
 
 	res, _ := json.Marshal(response)
 
