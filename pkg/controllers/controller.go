@@ -16,15 +16,14 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 
 	books := models.GetAllBooks()
 
-	utils.HandleSucess(w, books)
+	utils.HandleSucess(w, 200, books)
 }
-
 
 func GetBookById(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
-	bookId := vars["bookId"];
+	bookId := vars["bookId"]
 
 	id, err := strconv.ParseInt(bookId, 0, 0)
 
@@ -34,7 +33,12 @@ func GetBookById(w http.ResponseWriter, r *http.Request) {
 
 	book, _ := models.GetBookById(id)
 
-	utils.HandleSucess(w, book)
+	if book.ID != uint(id) {
+		utils.HandleBadRequest(w, http.StatusNotFound, "Book not found")
+		return
+	}
+
+	utils.HandleSucess(w, 200, book)
 }
 
 func CreateBook(w http.ResponseWriter, r *http.Request) {
@@ -45,14 +49,14 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 
 	b := newBook.CreateBook()
 
-	utils.HandleCreated(w, b)
+	utils.HandleSucess(w, 201, b)
 }
 
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
-	bookId := vars["bookId"];
+	bookId := vars["bookId"]
 
 	id, err := strconv.ParseInt(bookId, 0, 0)
 
@@ -62,7 +66,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 
 	book := models.DeleteBook(id)
 
-	utils.HandleSucess(w, book)
+	utils.HandleSucess(w, 200, book)
 }
 
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +76,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
-	bookId := vars["bookId"];
+	bookId := vars["bookId"]
 
 	id, err := strconv.ParseInt(bookId, 0, 0)
 
@@ -82,23 +86,27 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 
 	book, db := models.GetBookById(id)
 
+	if book.ID != uint(id) {
+		utils.HandleBadRequest(w, http.StatusNotFound, "Book not found")
+		return
+	}
+
 	if updateBook.Name != "" {
-		
+
 		book.Name = updateBook.Name
 	}
 
 	if updateBook.Author != "" {
-		
+
 		book.Author = updateBook.Author
 	}
 
 	if updateBook.Publication != "" {
-		
+
 		book.Publication = updateBook.Publication
 	}
 
-
 	db.Save(&book)
 
-	utils.HandleSucess(w, book)
+	utils.HandleSucess(w, 200, book)
 }

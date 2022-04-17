@@ -37,10 +37,10 @@ func responseHandler(w http.ResponseWriter, r response) {
 	w.Write(res)
 }
 
-func HandleSucess(w http.ResponseWriter, data interface{}) {
-	responseHandler(w, response{status: true, code: http.StatusOK, message: "success", data: data})
+func HandleSucess(w http.ResponseWriter, code int, data interface{}) {
+	responseHandler(w, response{status: true, code: code, message: "success", data: data})
 }
 
-func HandleCreated(w http.ResponseWriter, data interface{}) {
-	responseHandler(w, response{status: true, code: http.StatusCreated, message: "success", data: data})
+func HandleBadRequest(w http.ResponseWriter, code int, message string) {
+	responseHandler(w, response{status: false, code: code, message: message, data: nil})
 }
