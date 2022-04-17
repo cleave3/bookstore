@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type Response struct {
+type response struct {
 	status  bool
 	code    int
 	message string
@@ -21,7 +21,7 @@ func ParseBody(r *http.Request, x interface{}) {
 	}
 }
 
-func responseHandler(w http.ResponseWriter, r Response) {
+func responseHandler(w http.ResponseWriter, r response) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(r.code)
 
@@ -38,9 +38,9 @@ func responseHandler(w http.ResponseWriter, r Response) {
 }
 
 func HandleSucess(w http.ResponseWriter, data interface{}) {
-	responseHandler(w, Response{status: true, code: http.StatusOK, message: "success", data: data})
+	responseHandler(w, response{status: true, code: http.StatusOK, message: "success", data: data})
 }
 
 func HandleCreated(w http.ResponseWriter, data interface{}) {
-	responseHandler(w, Response{status: true, code: http.StatusCreated, message: "success", data: data})
+	responseHandler(w, response{status: true, code: http.StatusCreated, message: "success", data: data})
 }
